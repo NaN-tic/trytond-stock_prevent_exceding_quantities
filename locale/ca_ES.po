@@ -1,0 +1,12 @@
+# 
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "error:stock.shipment.out:"
+msgid ""
+"Move %(move)s makes inventory quantities of product \"%(product)s\" exceed "
+"outgoing quantities by %(quantity)s %(unit)s."
+msgstr ""
+"El moviment %(move)s provoca que els moviments d'inventari del producte "
+"\"%(product)s\" excedeixin les quantitats dels moviments de sortida amb "
+"%(quantity)s %(unit)s."
