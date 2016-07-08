@@ -19,7 +19,7 @@ class ShipmentOut:
                 })
 
     @classmethod
-    def pack(cls, shipments):
+    def check_outgoing_quantity(cls, shipments):
         pool = Pool()
         Uom = pool.get('product.uom')
         for shipment in shipments:
@@ -51,4 +51,7 @@ class ShipmentOut:
                             'unit': move.product.default_uom.rec_name,
                             })
 
-        return super(ShipmentOut, cls).pack(shipments)
+    @classmethod
+    def assign(cls, shipments):
+        cls.check_outgoing_quantity(shipments)
+        return super(ShipmentOut, cls).assign(shipments)
