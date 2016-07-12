@@ -9,6 +9,8 @@ Imports::
     >>> from decimal import Decimal
     >>> from operator import attrgetter
     >>> from proteus import config, Model, Wizard
+    >>> from trytond.modules.company.tests.tools import create_company, \
+    ...     get_company
     >>> today = datetime.date.today()
 
 Create database::
@@ -16,46 +18,19 @@ Create database::
     >>> config = config.set_trytond()
     >>> config.pool.test = True
 
-Install sale::
+Install stock_prevent_exceding_quantities::
 
-    >>> Module = Model.get('ir.module.module')
+    >>> Module = Model.get('ir.module')
     >>> module, = Module.find([
     ...     ('name', '=', 'stock_prevent_exceding_quantities')
     ...     ])
     >>> Module.install([module.id], config.context)
-    >>> Wizard('ir.module.module.install_upgrade').execute('upgrade')
+    >>> Wizard('ir.module.install_upgrade').execute('upgrade')
 
 Create company::
 
-    >>> Currency = Model.get('currency.currency')
-    >>> CurrencyRate = Model.get('currency.currency.rate')
-    >>> currencies = Currency.find([('code', '=', 'USD')])
-    >>> if not currencies:
-    ...     currency = Currency(name='U.S. Dollar', symbol='$', code='USD',
-    ...         rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
-    ...         mon_decimal_point='.', mon_thousands_sep=',')
-    ...     currency.save()
-    ...     CurrencyRate(date=today + relativedelta(month=1, day=1),
-    ...         rate=Decimal('1.0'), currency=currency).save()
-    ... else:
-    ...     currency, = currencies
-    >>> Company = Model.get('company.company')
-    >>> Party = Model.get('party.party')
-    >>> company_config = Wizard('company.company.config')
-    >>> company_config.execute('company')
-    >>> company = company_config.form
-    >>> party = Party(name='Dunder Mifflin')
-    >>> party.save()
-    >>> company.party = party
-    >>> company.currency = currency
-    >>> company_config.execute('add')
-    >>> company, = Company.find([])
-
-Reload the context::
-
-    >>> User = Model.get('res.user')
-    >>> Group = Model.get('res.group')
-    >>> config._context = User.get_preferences(True, config.context)
+    >>> _ = create_company()
+    >>> company = get_company()
 
 Create parties::
 
@@ -81,14 +56,12 @@ Create product::
     >>> product.template = template
     >>> product.save()
 
-
 Get locations::
 
     >>> Location = Model.get('stock.location')
     >>> storage, = Location.find([('code', '=', 'STO')])
     >>> outgoing_loc, = Location.find([('code', '=', 'OUT')])
     >>> customer_loc, = Location.find([('code', '=', 'CUS')])
-
 
 Create an Inventory::
 
@@ -122,12 +95,12 @@ Try to send exceding quantities with one move::
     ...     move.quantity = 6.0
     >>> shipment.save()
     >>> ShipmentOut.assign_try([shipment.id], config.context)
-    True
-    >>> shipment.click('pack')
     Traceback (most recent call last):
         ...
     UserError: ('UserError', (u'Move 6.0u product makes inventory quantities of product "product" exceed outgoing quantities by 1.0 Unit.', ''))
-    >>> shipment.click('wait')
+    >>> for move in shipment.inventory_moves:
+    ...     move.quantity = 5.0
+    >>> shipment.save()
     >>> ShipmentOut.assign_try([shipment.id], config.context)
     True
     >>> shipment.click('pack')
@@ -152,8 +125,6 @@ Try to send exceding quantities with more than one move::
     >>> move.quantity = 1.0
     >>> shipment.save()
     >>> ShipmentOut.assign_try([shipment.id], config.context)
-    True
-    >>> shipment.click('pack')
     Traceback (most recent call last):
         ...
     UserError: ('UserError', (u'Move 5.0u product makes inventory quantities of product "product" exceed outgoing quantities by 1.0 Unit.', ''))
