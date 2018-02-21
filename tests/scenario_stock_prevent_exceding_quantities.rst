@@ -9,23 +9,14 @@ Imports::
     >>> from decimal import Decimal
     >>> from operator import attrgetter
     >>> from proteus import config, Model, Wizard
+    >>> from trytond.tests.tools import activate_modules
     >>> from trytond.modules.company.tests.tools import create_company, \
     ...     get_company
     >>> today = datetime.date.today()
 
-Create database::
-
-    >>> config = config.set_trytond()
-    >>> config.pool.test = True
-
 Install stock_prevent_exceding_quantities::
 
-    >>> Module = Model.get('ir.module')
-    >>> module, = Module.find([
-    ...     ('name', '=', 'stock_prevent_exceding_quantities')
-    ...     ])
-    >>> Module.install([module.id], config.context)
-    >>> Wizard('ir.module.install_upgrade').execute('upgrade')
+    >>> config = activate_modules('stock_prevent_exceding_quantities')
 
 Create company::
 
@@ -94,10 +85,10 @@ Try to send exceding quantities with one move::
     >>> for move in shipment.inventory_moves:
     ...     move.quantity = 6.0
     >>> shipment.save()
-    >>> ShipmentOut.assign_try([shipment.id], config.context)
+    >>> ShipmentOut.assign_try([shipment.id], config.context)  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
-    UserError: ('UserError', (u'Move 6.0u product makes inventory quantities of product "product" exceed outgoing quantities by 1.0 Unit.', ''))
+    UserError: ...
     >>> for move in shipment.inventory_moves:
     ...     move.quantity = 5.0
     >>> shipment.save()
@@ -124,7 +115,7 @@ Try to send exceding quantities with more than one move::
     >>> move.to_location = outgoing_loc
     >>> move.quantity = 1.0
     >>> shipment.save()
-    >>> ShipmentOut.assign_try([shipment.id], config.context)
+    >>> ShipmentOut.assign_try([shipment.id], config.context)  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
-    UserError: ('UserError', (u'Move 5.0u product makes inventory quantities of product "product" exceed outgoing quantities by 1.0 Unit.', ''))
+    UserError: ...
