@@ -1,21 +1,15 @@
 # This file is part of Tryton.  The COPYRIGHT file at the top level of
 # this repository contains the full copyright notices and license terms.
 from trytond.pool import Pool, PoolMeta
+from trytond.i18n import gettext
+from trytond.exceptions import UserError
+
 
 __all__ = ['ShipmentOut']
 
 
 class ShipmentOut(metaclass=PoolMeta):
     __name__ = 'stock.shipment.out'
-
-    @classmethod
-    def __setup__(cls):
-        super(ShipmentOut, cls).__setup__()
-        cls._error_messages.update({
-                'exceding_quantity': ('Move %(move)s makes inventory '
-                    'quantities of product "%(product)s" exceed outgoing '
-                    'quantities by %(quantity)s %(unit)s.'),
-                })
 
     @classmethod
     def check_outgoing_quantity(cls, shipments):
@@ -43,12 +37,12 @@ class ShipmentOut(metaclass=PoolMeta):
                     outgoing_qty[move.product.id] -= qty_default_uom
                     continue
                 else:
-                    cls.raise_user_error('exceding_quantity', {
-                            'move': move.rec_name,
-                            'product': move.product.rec_name,
-                            'quantity': qty_default_uom - qty,
-                            'unit': move.product.default_uom.rec_name,
-                            })
+                    raise UserError(gettext(
+                        'stock_prevent_exceding_quantities.exceding_quantity',
+                            move=move.rec_name,
+                            product=move.product.rec_name,
+                            quantity=qty_default_uom - qty,
+                            unit=move.product.default_uom.rec_name))
 
     @classmethod
     def assign(cls, shipments):
