@@ -1,12 +1,11 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "error:stock.shipment.out:"
+msgctxt "model:ir.message,text:exceding_quantity"
 msgid ""
 "Move %(move)s makes inventory quantities of product \"%(product)s\" exceed "
 "outgoing quantities by %(quantity)s %(unit)s."
 msgstr ""
-"El movimiento existencias %(move)s provoca que la cantidad del producto "
-"\"%(product)s\" sobrepasa la cantidad de movimientos de salida en "
-"%(quantity)s %(unit)s."
+"El movimiento %(move)s hace que las cantidades de inventario del producto "
+"\"%(product)s\" excedan las cantidades salientes en %(quantity)s %(unit)s."
