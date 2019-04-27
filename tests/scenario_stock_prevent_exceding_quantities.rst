@@ -80,6 +80,7 @@ Try to send exceding quantities with one move::
     >>> move.from_location = outgoing_loc
     >>> move.to_location = customer_loc
     >>> move.quantity = 5.0
+    >>> move.unit_price = Decimal(0)
     >>> shipment.save()
     >>> shipment.click('wait')
     >>> for move in shipment.inventory_moves:
@@ -107,6 +108,7 @@ Try to send exceding quantities with more than one move::
     >>> move.from_location = outgoing_loc
     >>> move.to_location = customer_loc
     >>> move.quantity = 5.0
+    >>> move.unit_price = Decimal(0)
     >>> shipment.save()
     >>> shipment.click('wait')
     >>> move = shipment.inventory_moves.new()
