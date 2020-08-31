@@ -19,7 +19,7 @@ class ShipmentOut(metaclass=PoolMeta):
             # Sum all outgoing quantities
             outgoing_qty = {}
             for move in shipment.outgoing_moves:
-                if move.state == 'cancel':
+                if move.state == 'cancelled':
                     continue
                 quantity = Uom.compute_qty(move.uom, move.quantity,
                         move.product.default_uom, round=False)
@@ -27,7 +27,7 @@ class ShipmentOut(metaclass=PoolMeta):
                 outgoing_qty[move.product.id] += quantity
 
             for move in shipment.inventory_moves:
-                if move.state == 'cancel':
+                if move.state == 'cancelled':
                     continue
                 qty_default_uom = Uom.compute_qty(move.uom, move.quantity,
                     move.product.default_uom, round=False)
