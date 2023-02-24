@@ -95,7 +95,6 @@ Try to send exceding quantities with one move::
     ...     move.quantity = 5.0
     >>> shipment.save()
     >>> ShipmentOut.assign_try([shipment.id], config.context)
-    True
     >>> shipment.click('pick')
     >>> shipment.click('pack')
     >>> shipment.click('done')
