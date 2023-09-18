@@ -29,12 +29,13 @@ class ShipmentOut(metaclass=PoolMeta):
             for move in shipment.inventory_moves:
                 if move.state == 'cancelled':
                     continue
+                product_id = move.product.id
                 qty_default_uom = Uom.compute_qty(move.uom, move.quantity,
                     move.product.default_uom, round=False)
                 qty = outgoing_qty.get(move.product.id, 0.0)
                 # If it exist, decrease the sum
-                if qty_default_uom <= qty:
-                    outgoing_qty[move.product.id] -= qty_default_uom
+                if ((product_id in outgoing_qty) and (qty_default_uom <= qty)):
+                    outgoing_qty[product_id] -= qty_default_uom
                     continue
                 else:
                     raise UserError(gettext(
